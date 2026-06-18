@@ -7,9 +7,9 @@ login.
 
 ## Live Demo
 
-- **URL:** _add your `*.workers.dev` URL here after deploying_
-- **Login:** the password you set in `ADMIN_PASSWORD` (demo data password is in
-  your private notes — never commit it)
+- **URL:** https://finance-tracker.jedsadakorn-j.workers.dev
+- **Login:** the password set in the `ADMIN_PASSWORD` secret (kept private, never
+  committed)
 
 ![Dashboard](docs/screenshots/02-dashboard.png)
 

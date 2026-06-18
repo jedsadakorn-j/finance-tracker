@@ -16,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "finance-tracker",
-      "database_id": "PLACEHOLDER_RUN_WRANGLER_D1_CREATE",
+      "database_id": "c0c4a3ae-ed0f-4994-ad27-ed3684242c4d",
       "migrations_dir": "migrations"
     }
   ]
