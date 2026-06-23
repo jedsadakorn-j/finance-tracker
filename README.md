@@ -141,11 +141,23 @@ npm run deploy
 
 ### Auto-deploy from GitHub (CI/CD)
 
-Push this repo to GitHub, then in the Cloudflare dashboard:
-**Workers & Pages → Create → Connect to Git → select the repo.**
-Set the build command to `npm run build` and add `ADMIN_PASSWORD` /
-`SESSION_SECRET` as environment secrets. Every push to the main branch then
-builds and deploys automatically.
+This repo auto-deploys via **GitHub Actions** ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)):
+every push to `main` runs `npm ci` → `npm run build` → `npx wrangler deploy`.
+
+To set this up on your own fork, add two **GitHub repository secrets**
+(Settings → Secrets and variables → Actions):
+
+| Secret | Where to get it |
+|--------|-----------------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → "Edit Cloudflare Workers" template |
+| `CLOUDFLARE_ACCOUNT_ID` | `npx wrangler whoami` (or the dashboard URL) |
+
+The Worker secrets (`ADMIN_PASSWORD`, `SESSION_SECRET`) and the D1 binding
+persist on Cloudflare across deploys, so they are **not** needed in CI.
+
+> Cloudflare also offers a dashboard "Workers Builds" Git integration
+> (Worker → Settings → Build → Connect to Git). It works too, but GitHub Actions
+> was chosen here for visible build logs and pinned tool versions.
 
 ## API Reference
 
