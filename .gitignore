@@ -7,7 +7,9 @@ dist/
 
 # cloudflare / wrangler local state
 .wrangler/
-worker-configuration.d.ts
+# NOTE: worker-configuration.d.ts is committed so CI can typecheck the Worker.
+# It contains only binding TYPE names (e.g. ADMIN_PASSWORD: string), never values.
+# Regenerate after changing bindings with: npm run cf-typegen
 
 # secrets — NEVER commit these
 .dev.vars
