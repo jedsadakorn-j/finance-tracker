@@ -6,6 +6,7 @@ import type {
   MonthlyReportRow,
   Transaction,
   TransactionInput,
+  User,
 } from "../../shared/types";
 
 export class ApiError extends Error {
@@ -49,16 +50,22 @@ async function request<T>(
 }
 
 // ---- auth ----
-export const login = (password: string) =>
-  request<{ ok: true }>("/login", {
+export const login = (email: string, password: string) =>
+  request<{ user: User }>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ password }),
-  });
+    body: JSON.stringify({ email, password }),
+  }).then((r) => r.user);
 
-export const logout = () => request<{ ok: true }>("/logout", { method: "POST" });
+export const register = (email: string, password: string) =>
+  request<{ user: User }>("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  }).then((r) => r.user);
 
-export const checkSession = () =>
-  request<{ authenticated: boolean }>("/me");
+export const logout = () =>
+  request<{ ok: true }>("/auth/logout", { method: "POST" });
+
+export const checkSession = () => request<{ user: User | null }>("/me");
 
 // ---- categories ----
 export const getCategories = () =>

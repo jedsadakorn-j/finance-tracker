@@ -4,7 +4,14 @@ import { chromium } from "playwright";
 import { mkdirSync } from "node:fs";
 
 const base = process.argv[2] ?? "http://localhost:5173";
-const password = process.argv[3] ?? "finance123";
+const email = process.argv[3] ?? "demo@example.com";
+const password = process.argv[4] ?? "demo1234";
+
+async function signIn(page) {
+  await page.fill('input[type="email"]', email);
+  await page.fill('input[type="password"]', password);
+  await page.click('button[type="submit"]');
+}
 const outDir = "docs/screenshots";
 mkdirSync(outDir, { recursive: true });
 
@@ -25,8 +32,7 @@ await page.goto(base, { waitUntil: "networkidle" });
 await page.waitForSelector('input[type="password"]');
 await shot(page, "01-login");
 
-await page.fill('input[type="password"]', password);
-await page.click('button[type="submit"]');
+await signIn(page);
 await page.waitForSelector("text=Dashboard", { timeout: 10000 });
 await page.waitForTimeout(1200); // let charts render
 await shot(page, "02-dashboard");
@@ -59,8 +65,7 @@ await ctx.close();
 const mctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mpage = await mctx.newPage();
 await mpage.goto(base, { waitUntil: "networkidle" });
-await mpage.fill('input[type="password"]', password);
-await mpage.click('button[type="submit"]');
+await signIn(mpage);
 await mpage.getByRole("heading", { name: "Dashboard" }).waitFor();
 await mpage.waitForTimeout(1200);
 await shot(mpage, "07-mobile-dashboard");

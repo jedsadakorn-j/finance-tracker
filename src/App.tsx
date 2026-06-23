@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LoadingScreen } from "./components/ui";
 import Layout from "./components/Layout";
-import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 
 // Lazy-load authed pages so Recharts & co. stay out of the initial (login) bundle.
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -13,9 +13,9 @@ const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 
 function Gate() {
-  const { authed } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (authed === null) {
+  if (loading) {
     return (
       <div className="min-h-full bg-slate-50 dark:bg-slate-950">
         <LoadingScreen />
@@ -23,7 +23,7 @@ function Gate() {
     );
   }
 
-  if (!authed) return <Login />;
+  if (!user) return <Auth />;
 
   return (
     <BrowserRouter>

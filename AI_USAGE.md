@@ -60,9 +60,14 @@ or changed for **business logic / security / correctness** reasons:
   not mangled by Excel.
 - **SQL safety.** Confirmed all queries use bound parameters (no string
   concatenation), and that the `LIKE` search escapes `%`/`_`/`\`.
-- **Multi-user readiness.** Kept all DB access inside `worker/db.ts` so the
-  planned multi-user upgrade is a localized change (add `user_id` column +
-  `WHERE user_id = ?`) rather than a rewrite.
+- **Multi-user upgrade (data isolation).** Because all DB access was centralized
+  in `worker/db.ts`, adding multi-user was a localized change: migration `0002`
+  adds a `users` table + `user_id` columns (backfilling existing data under a
+  demo account), and every query gained `WHERE user_id = ?`. Isolation was
+  **verified manually** — a second registered account sees an empty ledger and
+  cannot read or write the demo user's rows. Login runs a constant-time password
+  verify even when the email doesn't exist, to avoid leaking which emails are
+  registered (user enumeration).
 
 ## Mistakes Found From AI
 

@@ -8,14 +8,15 @@ login.
 ## Live Demo
 
 - **URL:** https://finance-tracker.jedsadakorn-j.workers.dev
-- **Login:** the password set in the `ADMIN_PASSWORD` secret (kept private, never
-  committed)
+- **Demo account:** `demo@example.com` / `demo1234` (pre-populated with sample data)
+- Or **register your own account** — each user gets a private, isolated ledger.
 
 ![Dashboard](docs/screenshots/02-dashboard.png)
 
 ## Features
 
-- 🔐 **Login** — single password, stateless signed-cookie session (no secrets in code)
+- 🔐 **Multi-user auth** — email + password registration/login, per-user isolated data,
+  PBKDF2-hashed passwords, stateless signed-cookie sessions (no secrets in code)
 - 📊 **Dashboard** — income / expense / balance, avg expense/day, top category, total count
 - 📝 **Add / edit / delete** income & expense transactions (modal form with validation)
 - 🔎 **Transaction list** — newest first, filter by type / category / date range, search description
@@ -35,7 +36,7 @@ login.
 | Backend API  | **Hono** on **Cloudflare Workers**                  | Tiny, fast router that runs in the same Worker |
 | Database     | **Cloudflare D1** (SQLite)                          | Free, serverless SQL, native Workers binding |
 | Hosting      | **Cloudflare Workers** + static assets binding      | One Worker serves the SPA **and** the API — no CORS, one deploy |
-| Auth         | HMAC-signed session cookie (Web Crypto)             | Stateless → no KV/DB session storage needed |
+| Auth         | PBKDF2 password hashing + HMAC-signed session cookie (Web Crypto) | Per-user accounts, stateless sessions → no KV/DB session storage needed |
 
 > **Why one Worker instead of Pages + a separate Workers API?** Serving the SPA
 > assets and the API from a single Worker (`run_worker_first: ["/api/*"]`)
@@ -81,9 +82,11 @@ in production they are Wrangler secrets.
 
 | Variable         | Purpose                                            |
 |------------------|----------------------------------------------------|
-| `ADMIN_PASSWORD` | Password required to log in                        |
 | `SESSION_SECRET` | Key used to HMAC-sign session cookies (use a long random string: `openssl rand -base64 32`) |
 | `DB` (binding)   | Cloudflare D1 binding, configured in `wrangler.jsonc` |
+
+> User passwords are hashed with PBKDF2 (never stored in plaintext); only
+> `SESSION_SECRET` is needed as an app secret.
 
 ## Database Migration
 
@@ -130,9 +133,8 @@ npx wrangler d1 create finance-tracker
 npm run db:migrate:remote
 npm run db:seed:remote        # optional
 
-# 4. Set production secrets (you'll be prompted for the value)
-npx wrangler secret put ADMIN_PASSWORD
-npx wrangler secret put SESSION_SECRET
+# 4. Set the production secret (you'll be prompted for the value)
+openssl rand -base64 32 | npx wrangler secret put SESSION_SECRET
 
 # 5. Build + deploy
 npm run deploy
@@ -165,9 +167,10 @@ All endpoints are under `/api` and (except auth/health) require a valid session 
 
 | Method | Endpoint                  | Description |
 |--------|---------------------------|-------------|
-| POST   | `/api/login`              | Log in with `{ password }` → sets session cookie |
-| POST   | `/api/logout`             | Clear session |
-| GET    | `/api/me`                 | `{ authenticated: boolean }` |
+| POST   | `/api/auth/register`      | Register `{ email, password }` → creates account + session |
+| POST   | `/api/auth/login`         | Log in `{ email, password }` → sets session cookie |
+| POST   | `/api/auth/logout`        | Clear session |
+| GET    | `/api/me`                 | `{ user: { id, email } \| null }` |
 | GET    | `/api/transactions`       | List + filter (`type`,`category`,`start`,`end`,`search`,`limit`,`offset`) |
 | POST   | `/api/transactions`       | Create |
 | PUT    | `/api/transactions/:id`   | Update |

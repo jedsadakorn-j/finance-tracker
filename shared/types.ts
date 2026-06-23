@@ -2,6 +2,17 @@
 
 export type TransactionType = "income" | "expense";
 
+// A user account (the password hash never leaves the server).
+export interface User {
+  id: string;
+  email: string;
+}
+
+export interface AuthInput {
+  email: string;
+  password: string;
+}
+
 export interface Transaction {
   id: string;
   type: TransactionType;

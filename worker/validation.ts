@@ -12,6 +12,26 @@ export type Validated<T> =
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MONTH_RE = /^\d{4}-\d{2}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Validate login/registration credentials.
+export function validateCredentials(
+  body: unknown,
+): Validated<{ email: string; password: string }> {
+  if (typeof body !== "object" || body === null)
+    return { ok: false, error: "Body must be a JSON object" };
+  const b = body as Record<string, unknown>;
+  if (typeof b.email !== "string" || !EMAIL_RE.test(b.email.trim()))
+    return { ok: false, error: "A valid email is required" };
+  if (typeof b.password !== "string" || b.password.length < 8)
+    return { ok: false, error: "Password must be at least 8 characters" };
+  if (b.password.length > 200)
+    return { ok: false, error: "Password is too long" };
+  return {
+    ok: true,
+    value: { email: b.email.trim().toLowerCase(), password: b.password },
+  };
+}
 
 const KNOWN_CATEGORIES = new Set<string>([
   ...DEFAULT_INCOME_CATEGORIES,

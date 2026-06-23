@@ -2,9 +2,6 @@
 # In production, set these with: wrangler secret put <NAME>
 # NEVER commit the real .dev.vars file.
 
-# Password required to log in.
-ADMIN_PASSWORD="change-me-locally"
-
 # Secret used to sign session cookies (HMAC). Use a long random string.
 # Generate one with:  openssl rand -base64 32
 SESSION_SECRET="dev-only-insecure-secret-change-me"

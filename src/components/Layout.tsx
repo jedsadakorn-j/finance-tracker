@@ -35,7 +35,7 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export default function Layout() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
 
   return (
@@ -52,6 +52,17 @@ export default function Layout() {
           <NavItems />
         </nav>
         <div className="flex flex-col gap-1">
+          {user && (
+            <div
+              className="mb-1 truncate px-3 py-1 text-xs text-slate-400"
+              title={user.email}
+            >
+              Signed in as
+              <span className="block truncate font-medium text-slate-600 dark:text-slate-300">
+                {user.email}
+              </span>
+            </div>
+          )}
           <button
             onClick={toggle}
             className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
